@@ -21,8 +21,8 @@ def search():
         if isbn_or_key == 'isbn':
             result = YuShuBook.search_by_isbn(q)
         else:
-            result = YuShuBook.search_by_keyword(q)
+            result = YuShuBook.search_by_keyword(q,page)
             #dict序列化 API
         return jsonify(result)
     else:
-        return jsonify({'msg':'参数押证失败'})
+        return jsonify(form.errors)
