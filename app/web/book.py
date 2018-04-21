@@ -1,5 +1,5 @@
 from flask import jsonify, request
-
+import json
 from app.forms.book import SearchForm
 from app.libs.helper import is_isbn_or_key
 from app.spider.yushu_book import YuShuBook
@@ -16,18 +16,22 @@ def search():
     '''
     form = SearchForm(request.args)
     books = BookCollection()
+
     if form.validate():
         q = form.q.data.strip()
         page = form.page.data
         isbn_or_key = is_isbn_or_key(q)
+
         if isbn_or_key == 'isbn':
             yushu_book = YuShuBook()
             yushu_book.search_by_isbn(q)
         else:
             yushu_book = YuShuBook()
             yushu_book.search_by_keyword(q,page)
+
         books.fill(yushu_book,q)
         #dict序列化 API
-        return jsonify(books)
+        return json.dumps(books,default=lambda o: o.__dict__)
+        #return jsonify(books)
     else:
         return jsonify(form.errors)
