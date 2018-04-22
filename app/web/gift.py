@@ -1,5 +1,5 @@
 from . import web
-
+from flask_login import login_required
 
 @web.route('/my/gifts')
 def my_gift():
