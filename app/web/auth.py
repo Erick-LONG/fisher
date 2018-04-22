@@ -26,7 +26,7 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user,remember=True)
             next = request.args.get('next')
-            if not next and not next.startswith('/'):
+            if not next or not next.startswith('/'):
                 next = url_for('web.index')
             return redirect(next)
         else:
