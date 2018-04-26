@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from flask import current_app
 
 from app.models.base import Base, db
@@ -6,6 +8,8 @@ from sqlalchemy.orm import relationship
 
 from app.models.wish import Wish
 from app.spider.yushu_book import YuShuBook
+
+EachGiftWishCount = namedtuple('EachGiftWishCount',['count','isbn'])
 
 
 class Gift(Base):
@@ -30,11 +34,14 @@ class Gift(Base):
         # db.session 做查询
         # 接收条件表达式
         # mysql in
-        count_list = db.session.query(func.count(Wish.id),Wish.isbn).filter(Wish.launched==False,
-                                      Wish.isbn.in_(isbn_list),
-                                      Wish.status==1).group_by(
-                                      Wish.isbn).all()
-        pass
+        count_list = db.session.query(func.count(Wish.id),Wish.isbn).filter(
+            Wish.launched==False,
+            Wish.isbn.in_(isbn_list),
+            Wish.status==1).group_by(
+            Wish.isbn).all()
+
+        count_list = [{'count':w[0],'isbn':w[1]} for w in count_list]
+        return count_list
 
 
     @property
