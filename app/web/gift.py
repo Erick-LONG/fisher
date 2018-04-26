@@ -9,7 +9,11 @@ from flask_login import login_required,current_user
 @web.route('/my/gifts')
 @login_required
 def my_gift():
-    pass
+    uid = current_user.id
+    gift_of_mine = Gift.get_user_gifts(uid)
+    isbn_list = [gift.isbn for gift in gift_of_mine]
+    Gift.get_wish_counts(isbn_list)
+    return 'xxx'
 
 
 @web.route('/gifts/book/<isbn>')
