@@ -1,4 +1,4 @@
-from app.forms.auth import RegisterForm, LoginForm
+from app.forms.auth import RegisterForm, LoginForm, EmailForm
 from app.models.base import db
 from app.models.user import User
 from . import web
@@ -38,7 +38,13 @@ def login():
 
 @web.route('/reset/password',methods = ['GET','POST'])
 def forget_password_request():
-    pass
+    form = EmailForm(request.form)
+    if request.method =='POST':
+        if form.validate():
+            account_email = form.email.data
+            user = User.query.filter_by(email = account_email).first_or_404()
+            pass
+    return render_template('auth/forget_password_request.html',form = form)
 
 
 @web.route('/reset/password/<token>',methods = ['GET','POST'])
