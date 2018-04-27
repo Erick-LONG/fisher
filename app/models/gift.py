@@ -6,7 +6,7 @@ from app.models.base import Base, db
 from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, SmallInteger,desc,func
 from sqlalchemy.orm import relationship
 
-from app.models.wish import Wish
+
 from app.spider.yushu_book import YuShuBook
 
 EachGiftWishCount = namedtuple('EachGiftWishCount',['count','isbn'])
@@ -29,6 +29,7 @@ class Gift(Base):
 
     @classmethod
     def get_wish_counts(cls,isbn_list):
+        from app.models.wish import Wish
         #根据传入的一组isbn，到Wish表中计算出某个礼物
         #的wish心愿数量
         # db.session 做查询
@@ -64,3 +65,4 @@ class Gift(Base):
             desc(Gift.create_time)).limit(
             current_app.config['RECENT_BOOK_COUNT']).distinct().all()
         return recent_gift
+
