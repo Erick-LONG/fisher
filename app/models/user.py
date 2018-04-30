@@ -1,11 +1,14 @@
 from flask import current_app
+from math import floor
 
+from app.libs.enums import PendingStatus
 from app.libs.helper import is_isbn_or_key
 from app.models.base import Base, db
 from sqlalchemy import Column,Integer,String,Boolean,Float
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import UserMixin
 from app import login_manager
+from app.models.drift import Drift
 from app.models.gift import Gift
 from app.models.wish import Wish
 from app.spider.yushu_book import YuShuBook
@@ -77,6 +80,23 @@ class User(UserMixin,Base):
             user = User.query.get(uid)
             user.password = new_password
         return True
+
+    def can_send_drift(self):
+        if self.beans <1:
+            return False
+        success_gift_count = Gift.query.filter_by(
+            uid = self.id,launched = True).count()
+        success_receive_count = Drift.query.filter_by(requester_id = self.id,pending = PendingStatus.Success).count()
+        return True if floor(success_receive_count / 2) <= floor(success_gift_count) else False
+
+    @property
+    def summary(self):
+        return dict(
+            nickname = self.nickname,
+            beans = self.beans,
+            eamil = self.email,
+            send_receive = str(self.send_counter)+'/'+str(self.receive_counter)
+        )
 
 
 @login_manager.user_loader
